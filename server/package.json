@@ -1,0 +1,23 @@
+{
+  "name": "bee-social",
+  "version": "1.0.0",
+  "description": "Project for the Code vs. COVID-19 Hackathon 2020",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/geeooleea/code-vs-COVID-19.git"
+  },
+  "author": "Giulia Carocari, Matteo Padovan",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/geeooleea/code-vs-COVID-19/issues"
+  },
+  "homepage": "https://github.com/geeooleea/code-vs-COVID-19#readme",
+  "dependencies": {
+    "express": "4.17.1",
+    "chat-service": "1.0.0"
+  }
+}
