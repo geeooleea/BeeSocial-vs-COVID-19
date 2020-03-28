@@ -1,2 +1,2 @@
-# code-vs-COVID-19
-Project for the Code vs. COVID-19 Hackathon 2020
+# BeeSocial-vs-COVID-19
+Project for the CodeVsCOVID-19 Hackathon 2020
