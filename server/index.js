@@ -1,18 +1,57 @@
+require('dotenv').config()
+
+var redis = require('redis');
+var db = redis.createClient(process.env.DB_PORT, process.env.DB_HOST);
+
+db.on('connect', function() {
+    console.log('Redis client connected');
+});
+
+db.on('error', function (err) {
+    console.log('Something went wrong ' + err);
+});
+
 var express = require('express');
 var app = express();
 
-app.get('/', function (req, res) {
-   res.send('Hello World');
-});
-
 // GET the list of all activities
 app.get('/activities', function (req, res) {
-    res.send([{id: 1, title: 'Yoga', desc : 'Stretch body and mind with flexibility workouts and meditation.'} ,{ id: 2, title : 'House Cleaning, desc: Spring is here, time to refresh our quarantine cave!'}, {id: 3, title: 'Working from home', desc : 'Kickstart your productivity on the job with some easy measures.'}]);
+    /*
+    function get_res(key,results) {
+        return new Promise((resolve,reject) => {
+            db.get(key, (err,reply) => {
+                if (err) reject(err);
+                results.push(reply);
+                resolve(true);
+            });
+        });
+    }
+    for (let i = 0; i < reply[1].length; i++) {
+        let c = await get_res(reply[1][i],results);
+    }
+    res.send(results);
+    */
+    db.scan('0','MATCH','activity:*', async function(err, reply){
+        if(err) throw err;
+
+        var results = [];
+        cursor = reply[0];
+        console.log(cursor);
+        if(cursor === '0'){ // Then we are done
+            db.mget(reply[1], (err,reply) => {
+                if (err) throw err;
+                res.send(reply);
+            });
+        } else {
+            console.log('How could this happen???');
+            // SHOULD NOT HAPPEN IN PROTOTYPE
+        }
+    });
 });
 
 // GET the checklist for an activity given its id
 app.get('/step_by_step/:activity', function (req, res) {
-    res.send([{id: 1, desc: 'Hop into something comfy.', equipment :'Comfortable sports clothing.'} ,{ id: 2, desc: 'Breathe lots of love in.', equipment : null}, {id: 3, desc: 'Breathe lots of love out.', equipment : null}]);
+    res.status(501).send('Our code monkeys are still working on this.');
 });
 
 // Fetch if there is an active buddy for the given shared activity
