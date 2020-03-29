@@ -40,7 +40,10 @@ app.get('/activities', function (req, res) {
         if(cursor === '0'){ // Then we are done
             db.mget(reply[1], (err,reply) => {
                 if (err) throw err;
-                res.send(reply);
+                for (let i = 0; i < reply.length; i++) {
+                    reply[i] = JSON.parse(reply[i]);                    
+                }
+                res.json(reply);
             });
         } else {
             console.log('How could this happen???');
@@ -56,13 +59,12 @@ app.get('/step_by_step/:activity', function (req, res) {
 
 // Fetch if there is an active buddy for the given shared activity
 app.get('/buddy/:activity', function (req, res) {
-    if (req.params("activity") == 1) res.send({ buddy : 1, ideal: true });
-    else res.status(404).send({error : 'No buddy found yet'});
+    res.status(501).send('Our code monkeys are still working on this.');
 });
 
 // GET a list of all activities for this user
 app.get('/buddy/:user_id/shared_activity', function (req, res) {
-    res.send([{ id: 1, participants : [1, 4], activity_id : 1, active : true,  checklist : [[true, true, false], [true, false, false]] }]);
+    res.status(501).send('Our code monkeys are still working on this.');
 });
 
 // GET a specific shared activity by its id
