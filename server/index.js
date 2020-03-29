@@ -6,9 +6,13 @@ var express = require('express');
 var app = express();
 
 const bodyParser = require('body-parser');
-app.use(bodyParser);
+app.use(bodyParser.urlencoded({
+    extended: true
+}));
+app.use(bodyParser.json());
 
 // Add headers
+
 app.use(function (req, res, next) {
 
     // Website you wish to allow to connect
@@ -81,8 +85,19 @@ app.get('/shared_activity/:id', function (req, res) {
     });
 });
 
-app.post('shared_activity/', function (req,res) {
-    console.log(res.body);
+app.post('/user', async (req,res) => {
+    var user = req.body;
+    await db.incr('user_key', (err,reply) => {
+        if (err) throw err;
+        var key = 'user:'+reply;
+        user.id = key;
+        db.set(key, JSON.stringify(user), () => {
+            res.send(user);
+        });
+    })
+});
+
+app.post('/shared_activity/', function (req,res) {
 });
 
 // GET the checklist for an activity given its id
