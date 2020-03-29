@@ -67,24 +67,10 @@ app.get('/buddy/:user_id/shared_activity', function (req, res) {
 
 // GET a specific shared activity by its id
 app.get('/shared_activity/:id', function (req, res) {
-    res.send({ id: 1, participants : [1, 4], activity_id : 1, active : true,  checklist : [[true, true, false], [true, false, false]] });
+    db.get(req.params('id'), (err,reply) => {
+        res.send(reply);
+    });
 });
-
-// GET a specific shared activity by its id
-app.post('/shared_activity/', function (req, res) {
-    res.send({ id: 1 });
-});
-
-// GET a specific shared activity by its id
-app.put('/shared_activity/', function (req, res) {
-    res.send({ id: 1 });
-});
-
-// GET a specific shared activity by its id
-app.post('/shared_activity/:activity_id/step/:step_id', function (req, res) {
-    res.send({ id: 1 });
-});
-
 
 var server = app.listen(8080, function () {
    console.log("App listening at http://%s:%s", server.address().address, server.address().port);
