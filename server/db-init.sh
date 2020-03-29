@@ -1,0 +1,5 @@
+redis-cli SET "activity:1" "{\"id\":\"activity:1\",\"title\":\"Yoga\",\"desc\":\"Stretch body and mind with flexibility workouts and meditation.\"}"
+redis-cli SET "activity:2" "{\"id\":\"activity:2\",\"title\":\"House Cleaning\",\"desc\":\"'Spring is here, time to refresh our quarantine cave!'\"}"
+redis-cli SET "activity:3" "{\"id\":\"activity:3\",\"title\":\"Working from Home\",\"desc\":\"Kickstart your productivity even when working from home.\"}"
+redis-cli SET "activity:4" "{\"id\":\"activity:4\",\"title\":\"Work Out\",\"desc\":\"Activate your body while staying in your home or backyard.\"}"
+redis-cli SET "activity:5" "{\"id\":\"activity:5\",\"title\":\"Studying\",\"desc\":\"Get your mind flowing.\"}"
