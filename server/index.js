@@ -2,6 +2,31 @@ require('dotenv').config()
 
 var redis = require('redis');
 var db = redis.createClient(process.env.DB_PORT, process.env.DB_HOST);
+var express = require('express');
+var app = express();
+
+const bodyParser = require('body-parser');
+app.use(bodyParser);
+
+// Add headers
+app.use(function (req, res, next) {
+
+    // Website you wish to allow to connect
+    res.setHeader('Access-Control-Allow-Origin', 'http://localhost:8080');
+
+    // Request methods you wish to allow
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
+
+    // Request headers you wish to allow
+    res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type');
+
+    // Set to true if you need the website to include cookies in the requests sent
+    // to the API (e.g. in case you use sessions)
+    res.setHeader('Access-Control-Allow-Credentials', true);
+
+    // Pass to next layer of middleware
+    next();
+});
 
 db.on('connect', function() {
     console.log('Redis client connected');
@@ -10,9 +35,6 @@ db.on('connect', function() {
 db.on('error', function (err) {
     console.log('Something went wrong ' + err);
 });
-
-var express = require('express');
-var app = express();
 
 // GET the list of all activities
 app.get('/activities', function (req, res) {
@@ -52,6 +74,17 @@ app.get('/activities', function (req, res) {
     });
 });
 
+// GET a specific shared activity by its id
+app.get('/shared_activity/:id', function (req, res) {
+    db.get(req.params('id'), (err,reply) => {
+        res.send(reply);
+    });
+});
+
+app.post('shared_activity/', function (req,res) {
+    console.log(res.body);
+});
+
 // GET the checklist for an activity given its id
 app.get('/step_by_step/:activity', function (req, res) {
     res.status(501).send('Our code monkeys are still working on this.');
@@ -67,13 +100,6 @@ app.get('/buddy/:user_id/shared_activity', function (req, res) {
     res.status(501).send('Our code monkeys are still working on this.');
 });
 
-// GET a specific shared activity by its id
-app.get('/shared_activity/:id', function (req, res) {
-    db.get(req.params('id'), (err,reply) => {
-        res.send(reply);
-    });
-});
-
-var server = app.listen(8080, function () {
+var server = app.listen(process.env.PORT, function () {
    console.log("App listening at http://%s:%s", server.address().address, server.address().port);
 });
