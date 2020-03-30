@@ -75,7 +75,7 @@ let a = {
             axios.get("http://localhost:3000/buddy/" + res.data.id)
             .then(res => {
               if (res.data.matched === true) {
-                this.$router.push('chat');
+                this.$router.push('chatv');
               }
             });
           }, 1000);
