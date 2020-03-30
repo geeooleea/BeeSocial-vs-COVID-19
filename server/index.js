@@ -1,9 +1,15 @@
 require('dotenv').config()
-
 var redis = require('redis');
 var db = redis.createClient(process.env.DB_PORT, process.env.DB_HOST);
 var express = require('express');
 var app = express();
+
+var http = require('http').createServer(app);
+var io = require('socket.io')(http);
+  
+http.listen(process.env.PORT, function(){
+    console.log('listening on *:'+process.env.PORT);
+});
 
 const bodyParser = require('body-parser');
 app.use(bodyParser.urlencoded({
@@ -26,6 +32,17 @@ db.on('connect', function() {
 
 db.on('error', function (err) {
     console.log('Something went wrong ' + err);
+});
+
+// app.get('/', (req,res) => {
+//    res.sendFile(__dirname + '/index.html');
+//});
+
+io.on('connection', function(socket){
+
+    socket.on('chat message', function(msg){
+        io.emit('chat message', msg);
+    });
 });
 
 // GET the list of all activities
@@ -162,8 +179,4 @@ app.get('/buddy/:shared_activity_id', function (req, res) {
 // GET a list of all activities for this user
 app.get('/buddy/:user_id/shared_activity', function (req, res) {
     res.status(501).send('Our code monkeys are still working on this.');
-});
-
-var server = app.listen(process.env.PORT, function () {
-   console.log("App listening at http://%s:%s", server.address().address, server.address().port);
 });
