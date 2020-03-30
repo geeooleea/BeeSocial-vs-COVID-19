@@ -50,7 +50,6 @@ app.get('/activities', function (req, res) {
 
         var results = [];
         cursor = reply[0];
-        console.log(cursor);
         if(cursor === '0'){ // Then we are done
             db.mget(reply[1], (err,reply) => {
                 if (err) throw err;
@@ -92,13 +91,13 @@ app.post('/shared_activity/', function (req,res) {
     db.get(activity.id, (err,reply) => {
         if (err) res.send(err);
         else if (!reply) res.status(404).send("No activity with this ID found!");
-        else db.incr('shared_activity_key', (err,reply_id) => {
-            var key = 'shared_activity:'+(activity.id.split(':')[1])+':'+reply_id;
+        else {
+            var key = 'shared_activity:'+(activity.id.split(':')[1])+':'+activity.user.split(':')[1];
             var shared = { id: key, activity : activity.id, users : [ activity.user ], matched : false };
             db.set(key, JSON.stringify(shared), () => {
-                res.send(shared);
+                res.json(shared);
             });
-        });
+        }
     });
 });
 
@@ -116,8 +115,48 @@ app.get('/step_by_step/:activity', function (req, res) {
 });
 
 // Fetch if there is an active buddy for the given shared activity
-app.get('/buddy/:activity', function (req, res) {
-    res.status(501).send('Our code monkeys are still working on this.');
+app.get('/buddy/:shared_activity_id', function (req, res) {
+    var id = req.params.shared_activity_id;
+    db.get(id, (err,shared_activity)  => {
+        shared_activity = JSON.parse(shared_activity);
+        if (err) throw err;
+        else if (shared_activity.matched) res.json(shared_activity);
+        else db.scan('0','MATCH',id.split(':')[0]+':'+id.split(':')[1]+':*', 'COUNT', '1000', async function(err, reply){
+            if(err) throw err;
+            
+            cursor = reply[0];
+            var user = id.split(':')[2];
+            console.log(reply[1]);
+            if(cursor === '0'){ // Then we are done
+                if (reply[1].length > 0) 
+                    db.mget(reply[1], async (err,reply) => {
+                        if (err) throw err;
+                        
+                        console.log(reply);
+                        var matched = false;
+                        for (let i = 0; i < reply.length; i++) {
+                            reply[i] = JSON.parse(reply[i]);
+                            if (reply[i].matched === false && reply[i].users[0] != 'user:'+user) {
+                                reply[i].users.push('user:'+user);
+                                reply[i].matched = true;
+                                shared_activity.users.push(reply[i].users[0]);
+                                shared_activity.matched = true;
+                                await db.set(reply[i].id, JSON.stringify(reply[i]));
+                                await db.set(id, JSON.stringify(shared_activity));
+                                res.json(shared_activity);
+                                matched = true;
+                                break;
+                            }  
+                        }
+                        if (!matched) res.sendStatus(404);
+                    });
+                else res.sendStatus(404);
+            } else {
+                console.log('How could this happen???');
+                // SHOULD NOT HAPPEN IN PROTOTYPE
+            }
+        });
+    });
 });
 
 // GET a list of all activities for this user
