@@ -68,7 +68,7 @@ app.get('/activities', function (req, res) {
 
 // GET a specific shared activity by its id
 app.get('/shared_activity/:id', function (req, res) {
-    db.get(req.params('id'), (err,reply) => {
+    db.get(req.params.id, (err,reply) => {
         res.send(reply);
     });
 });
@@ -93,12 +93,20 @@ app.post('/shared_activity/', function (req,res) {
         if (err) res.send(err);
         else if (!reply) res.status(404).send("No activity with this ID found!");
         else db.incr('shared_activity_key', (err,reply_id) => {
-            var key = 'shared_activity:'+activity.id+':'+reply_id;
-            var shared = { id: key, activity : activity.id, users : [ activity.user ]};
+            var key = 'shared_activity:'+(activity.id.split(':')[1])+':'+reply_id;
+            var shared = { id: key, activity : activity.id, users : [ activity.user ], matched : false };
             db.set(key, JSON.stringify(shared), () => {
                 res.send(shared);
             });
         });
+    });
+});
+
+app.delete('/shared_activity/:id', function (req,res) {
+    console.log('Deleting activity' + req.params.id);
+    db.del(req.params.id, (err,reply) => {
+        if (err) res.status(404).send('Shared activity not found');
+        else res.status(200).send();
     });
 });
 
