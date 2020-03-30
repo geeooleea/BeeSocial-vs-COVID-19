@@ -75,12 +75,15 @@ let a = {
             axios.get("http://localhost:3000/buddy/" + res.data.id)
             .then(res => {
               if (res.data.matched === true) {
-                clearInterval(this.polling)
                 this.$router.push('chat');
               }
             });
           }, 1000);
     }
+  },
+
+  beforeDestroy() {
+    clearInterval(this.polling)
   }
 };
 
