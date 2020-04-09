@@ -1,0 +1,7 @@
+CREATE TABLE activities(
+    id INT NOT NULL AUTO_INCREMENT,
+    title VARCHAR(40) NOT NULL,
+    description VARCHAR(256) NOT NULL,
+    img VARCHAR(256) NOT NULL,
+    PRIMARY KEY (id)
+);
