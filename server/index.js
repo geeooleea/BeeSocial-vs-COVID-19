@@ -1,14 +1,17 @@
-require('dotenv').config()
-var redis = require('redis');
-var db = redis.createClient(process.env.DB_PORT, process.env.DB_HOST);
+require('dotenv').config();
+
 var express = require('express');
 var app = express();
 
 var http = require('http').createServer(app);
 var io = require('socket.io')(http);
-  
+
+var Dao = require('./dao.js');
+var dao = new Dao();
+
 http.listen(process.env.PORT, function(){
     console.log('listening on *:'+process.env.PORT);
+    dao.connect();
 });
 
 const bodyParser = require('body-parser');
@@ -26,62 +29,31 @@ app.use(function (req, res, next) {
     next();
 });
 
-db.on('connect', function() {
-    console.log('Redis client connected');
-});
-
-db.on('error', function (err) {
-    console.log('Something went wrong ' + err);
-});
-
-// app.get('/', (req,res) => {
+// app.get('/', (req,res) => {send
 //    res.sendFile(__dirname + '/index.html');
 //});
-
+/*
 io.on('connection', function(socket){
 
     socket.on('chat message', function(msg){
         io.emit('chat message', msg);
     });
 });
+*/
+
+// GET images
+app.get('/img/:type/:name', (req,res) => {
+    res.sendFile(process.env.SERVER_PATH+'/img/'+req.params.type+'/'+req.params.name);
+});
 
 // GET the list of all activities
-app.get('/activities', function (req, res) {
-    /*
-    function get_res(key,results) {
-        return new Promise((resolve,reject) => {
-            db.get(key, (err,reply) => {
-                if (err) reject(err);
-                results.push(reply);
-                resolve(true);
-            });
-        });
-    }
-    for (let i = 0; i < reply[1].length; i++) {
-        let c = await get_res(reply[1][i],results);
-    }
-    res.send(results);
-    */
-    db.scan('0','MATCH','activity:*', async function(err, reply){
-        if(err) throw err;
-
-        var results = [];
-        cursor = reply[0];
-        if(cursor === '0'){ // Then we are done
-            db.mget(reply[1], (err,reply) => {
-                if (err) throw err;
-                for (let i = 0; i < reply.length; i++) {
-                    reply[i] = JSON.parse(reply[i]);                    
-                }
-                res.json(reply);
-            });
-        } else {
-            console.log('How could this happen???');
-            // SHOULD NOT HAPPEN IN PROTOTYPE
-        }
+app.get('/activities', (req, res) => {
+    dao.getActivities((results) => {
+        res.json(results);
     });
 });
 
+/*
 // GET a specific shared activity by its id
 app.get('/shared_activity/:id', function (req, res) {
     db.get(req.params.id, (err,reply) => {
@@ -180,3 +152,4 @@ app.get('/buddy/:shared_activity_id', function (req, res) {
 app.get('/buddy/:user_id/shared_activity', function (req, res) {
     res.status(501).send('Our code monkeys are still working on this.');
 });
+*/
