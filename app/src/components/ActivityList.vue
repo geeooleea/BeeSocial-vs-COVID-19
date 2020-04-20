@@ -39,8 +39,8 @@
 </template>
 
 <script>
-import axios from "axios";
-import data from "../data.js";
+// import axios from "axios";
+// import data from "../data.js";
 
 let a = {
   name: "ActivityList",
@@ -52,39 +52,6 @@ let a = {
       dialog: null
     };
   },
-
-  mounted() {
-    axios.get("http://localhost:3000/activities").then(res => {
-      this.activities = res.data;
-    });
-  },
-
-  methods: {
-    pa(a) {
-      axios
-        .post("http://localhost:3000/shared_activity", {
-          id: a,
-          user: data.getUser().data.id
-        })
-        .then(res => {
-          this.pollData(res);
-        });
-    },
-    pollData(res) {
-      this.polling = setInterval(() => {
-            axios.get("http://localhost:3000/buddy/" + res.data.id)
-            .then(res => {
-              if (res.data.matched === true) {
-                this.$router.push('chatv');
-              }
-            });
-          }, 1000);
-    }
-  },
-
-  beforeDestroy() {
-    clearInterval(this.polling)
-  }
 };
 
 export default a;

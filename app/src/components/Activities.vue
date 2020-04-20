@@ -14,7 +14,6 @@
 <script>
 import ActivityList from "./ActivityList";
 import IntroActivities from "./IntroActivities";
-import data from '../data.js'
 
 export default {
   name: "activities",
@@ -23,7 +22,6 @@ export default {
     IntroActivities
   },
   mounted() {
-      console.log(data.getUser());
   }
 };
 </script>
