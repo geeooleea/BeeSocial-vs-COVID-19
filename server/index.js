@@ -1,24 +1,27 @@
 require('dotenv').config();
 
 var express = require('express');
-var app = express();
-
-var http = require('http').createServer(app);
 var io = require('socket.io')(http);
-
 var Dao = require('./dao.js');
-var dao = new Dao();
+var session = require('express-session')
 
-http.listen(process.env.PORT, function(){
-    console.log('listening on *:'+process.env.PORT);
-    dao.connect();
-});
+var app = express();
+var http = require('http').createServer(app);
+var dao = new Dao();
 
 const bodyParser = require('body-parser');
 app.use(bodyParser.urlencoded({
     extended: true
 }));
+
 app.use(bodyParser.json());
+
+app.use(session({
+    secret: process.env.SESSION_SECRET,
+    resave: false,
+    saveUninitialized: true,
+    cookie: { maxAge : 1000 * 60 * 60 * 24 * 365 }
+}));
 
 app.use(function (req, res, next) {
     res.setHeader('Access-Control-Allow-Origin', 'http://localhost:8080');
@@ -29,9 +32,13 @@ app.use(function (req, res, next) {
     next();
 });
 
-// app.get('/', (req,res) => {send
-//    res.sendFile(__dirname + '/index.html');
-//});
+app.use(express.static('assets/'));
+
+http.listen(process.env.PORT, function(){
+    console.log('listening on *:'+process.env.PORT);
+    dao.connect();
+});
+
 /*
 io.on('connection', function(socket){
 
@@ -40,11 +47,6 @@ io.on('connection', function(socket){
     });
 });
 */
-
-// GET images
-app.get('/img/:type/:name', (req,res) => {
-    res.sendFile(process.env.SERVER_PATH+'/img/'+req.params.type+'/'+req.params.name);
-});
 
 // GET the list of all activities
 app.get('/activities', (req, res) => {
