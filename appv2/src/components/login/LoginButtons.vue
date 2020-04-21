@@ -4,20 +4,30 @@
       <div class="img-wrapper">
         <v-img :src="require('@/assets/buttons/g-logo.png')" class="g-logo"></v-img>
       </div>
-      <div class="logo-desc">Sign in with Google</div>
+      <div class="logo-desc" @click="signIn()">Sign in with Google</div>
     </div>
   </v-container>
 </template>
 
 <script>
+import axios from 'axios';
 import backgroundUrl from "@/assets/vectors/loginv2.svg";
 export default {
   name: "LoginButtons",
   data() {
     return {
       backgroundUrl: backgroundUrl,
-      center: "center"
+      center: "center",
+      signInUrl: '/auth/google'
     };
+  },
+  methods: {
+    signIn() {
+      axios.get(`http://localhost:3000${this.signInUrl}`)
+        .then(function (response) {
+        console.log(response);
+      });
+    }
   }
 };
 </script>
