@@ -1,27 +1,22 @@
 require('dotenv').config();
 
 var express = require('express');
-var io = require('socket.io')(http);
-var Dao = require('./dao.js');
-var session = require('express-session')
-
 var app = express();
+
 var http = require('http').createServer(app);
+var io = require('socket.io')(http);
+
+var Dao = require('./dao.js');
 var dao = new Dao();
+
+var passport = require('passport');
+var GoogleStrategy = require('passport-google-oauth').OAuth2Strategy;
 
 const bodyParser = require('body-parser');
 app.use(bodyParser.urlencoded({
     extended: true
 }));
-
 app.use(bodyParser.json());
-
-app.use(session({
-    secret: process.env.SESSION_SECRET,
-    resave: false,
-    saveUninitialized: true,
-    cookie: { maxAge : 1000 * 60 * 60 * 24 * 365 }
-}));
 
 app.use(function (req, res, next) {
     res.setHeader('Access-Control-Allow-Origin', 'http://localhost:8080');
@@ -39,14 +34,43 @@ http.listen(process.env.PORT, function(){
     dao.connect();
 });
 
-/*
+passport.use(new GoogleStrategy({
+    clientID: process.env.GOOGLE_CLIENT_ID,
+    clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+    callbackURL: 'http://'+process.env.HOSTNAME+':'+process.env.PORT+'/auth/google/callback'
+    },
+    function(accessToken, refreshToken, profile, done) {
+        console.log(profile)
+        dao.findOrCreateUser(profile, function (err, user) {
+            return done(err, user);
+        });
+    }
+));
+
+app.get('/auth/google',
+    passport.authenticate('google', { scope: ['https://www.googleapis.com/auth/plus.login', 'https://www.googleapis.com/auth/userinfo.email'] }));
+
+app.get('/auth/google/callback', 
+    passport.authenticate('google', { failureRedirect: '/login' }),
+        function(req, res) {
+            console.log(req)
+            res.redirect('/activities');
+    });
+
+// app.get('/', (req,res) => {send
+//    res.sendFile(__dirname + '/index.html');
+//});/*
 io.on('connection', function(socket){
 
     socket.on('chat message', function(msg){
         io.emit('chat message', msg);
     });
 });
-*/
+
+// GET images
+app.get('/img/:type/:name', (req,res) => {
+    res.sendFile(process.env.SERVER_PATH+'/img/'+req.params.type+'/'+req.params.name);
+});
 
 // GET the list of all activities
 app.get('/activities', (req, res) => {

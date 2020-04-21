@@ -32,6 +32,12 @@ class Dao {
             return callback(results);
         });
     }
+
+    async findOrCreateUser(user, callback) {
+        if (user.provider == 'google') {
+        }
+        else throw 'Unsupported login provider';
+    }
 }
 
 module.exports = Dao;
