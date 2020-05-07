@@ -5,6 +5,7 @@ var app = express();
 
 var http = require('http').createServer(app);
 var io = require('socket.io')(http);
+var ip = require('ip');
 
 var Dao = require('./dao.js');
 var dao = new Dao();
@@ -29,17 +30,17 @@ app.use(function (req, res, next) {
 
 app.use(express.static('assets/'));
 
-http.listen(process.env.PORT, function(){
-    console.log('listening on *:'+process.env.PORT);
+http.listen(process.env.PORT, function () {
+    console.log('listening on *:' + process.env.PORT);
     dao.connect();
 });
 
 passport.use(new GoogleStrategy({
     clientID: process.env.GOOGLE_CLIENT_ID,
     clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-    callbackURL: 'http://'+process.env.HOSTNAME+':'+process.env.PORT+'/auth/google/callback'
-    },
-    function(accessToken, refreshToken, profile, done) {
+    callbackURL: 'http://beesocial.ddns.net/auth/google/callback'
+},
+    function (accessToken, refreshToken, profile, done) {
         console.log(profile)
         dao.findOrCreateUser(profile, function (err, user) {
             return done(err, user);
@@ -50,26 +51,28 @@ passport.use(new GoogleStrategy({
 app.get('/auth/google',
     passport.authenticate('google', { scope: ['https://www.googleapis.com/auth/plus.login', 'https://www.googleapis.com/auth/userinfo.email'] }));
 
-app.get('/auth/google/callback', 
+app.get('/auth/google/callback',
     passport.authenticate('google', { failureRedirect: '/login' }),
-        function(req, res) {
-            console.log(req)
-            res.redirect('/activities');
+    function (req, res) {
+        console.log(req)
+        res.redirect(process.env.HOSTNAME + '/auth-success');
     });
 
+app.get('/auth-success', (req, res) => {
+    res.send('<head></head><body><a href=\"beesocial://auth/ok/34785g2ur289f98eb8\">fraaa</a></body>');
+});
 // app.get('/', (req,res) => {send
 //    res.sendFile(__dirname + '/index.html');
 //});/*
-io.on('connection', function(socket){
-
-    socket.on('chat message', function(msg){
+io.on('connection', function (socket) {
+    socket.on('chat message', function (msg) {
         io.emit('chat message', msg);
     });
 });
 
 // GET images
-app.get('/img/:type/:name', (req,res) => {
-    res.sendFile(process.env.SERVER_PATH+'/img/'+req.params.type+'/'+req.params.name);
+app.get('/img/:type/:name', (req, res) => {
+    res.sendFile(process.env.SERVER_PATH + '/img/' + req.params.type + '/' + req.params.name);
 });
 
 // GET the list of all activities
@@ -138,15 +141,15 @@ app.get('/buddy/:shared_activity_id', function (req, res) {
         else if (shared_activity.matched) res.json(shared_activity);
         else db.scan('0','MATCH',id.split(':')[0]+':'+id.split(':')[1]+':*', 'COUNT', '1000', async function(err, reply){
             if(err) throw err;
-            
+
             cursor = reply[0];
             var user = id.split(':')[2];
             console.log(reply[1]);
             if(cursor === '0'){ // Then we are done
-                if (reply[1].length > 0) 
+                if (reply[1].length > 0)
                     db.mget(reply[1], async (err,reply) => {
                         if (err) throw err;
-                        
+
                         console.log(reply);
                         var matched = false;
                         for (let i = 0; i < reply.length; i++) {
@@ -161,7 +164,7 @@ app.get('/buddy/:shared_activity_id', function (req, res) {
                                 res.json(shared_activity);
                                 matched = true;
                                 break;
-                            }  
+                            }
                         }
                         if (!matched) res.sendStatus(404);
                     });

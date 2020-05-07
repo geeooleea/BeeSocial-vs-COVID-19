@@ -4,8 +4,7 @@
       <div class="img-wrapper">
         <v-img :src="require('@/assets/buttons/g-logo.png')" class="g-logo"></v-img>
       </div>
-      <!-- <div class="logo-desc" @click="signIn()">Sign in with Google</div> -->
-      <a href="beesocial://activities"><div class="logo-desc">Sign in with Google</div></a>
+      <div class="logo-desc" @click="signIn()">Sign in with Google</div>
     </div>
   </v-container>
 </template>
@@ -19,13 +18,13 @@ export default {
     return {
       backgroundUrl: backgroundUrl,
       center: "center",
-      signInUrl: '/auth/google',
+      signInUrl: '/auth-success',
       serverIp: 'http://192.168.1.9:3000'
     };
   },
   methods: {
     signIn() {
-      window.cordova.InAppBrowser.open(`${this.serverIp}${this.signInUrl}`, '_system')
+      window.cordova.InAppBrowser.open(this.serverIp+this.signInUrl, '_system', 'location=yes');
     }
   }
 };
