@@ -1,20 +1,14 @@
 <template>
   <div class="wrapper">
     <p>Choose a category</p>
-    <img src="@/assets/vectors/actvstroke.svg" class="img"/>
+    <v-img :src="require('@/assets/vectors/actvs.svg')"></v-img>
   </div>
 </template>
 
 <script>
-import actvstroke from '@/assets/svg/actvstroke.vue';
 
 export default {
-  name: "IntroActivites",
-  data() {
-    return {
-      actvstroke: actvstroke
-    }
-  }
+  name: "IntroActivites"
 };
 </script>
 
@@ -25,20 +19,17 @@ export default {
   color: #27253f;
   font-family: Pacifico;
   text-align: center;
-  font-size: 40px;
+  font-size: 5vh;
   z-index: 2;
+  width: 100%;
 }
 
-.img {
-  width: 110%;
-  position: relative;
-  left: -5%;
-  top: -3vh;
+img {
+  width: 100%;
+  margin: auto;
 }
 
 p {
-  padding-top: 5vh;
-  padding-bottom: 5vh;
   background-color: #f8f7f7;
 }
 </style>

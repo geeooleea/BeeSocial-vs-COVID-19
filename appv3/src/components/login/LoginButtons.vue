@@ -42,7 +42,7 @@ export default {
 .logo-desc {
   font-family: RobotoMedium;
   padding-left: 10px;
-  font-size: 22px;
+  font-size: 3vh;
   color: rgba(0, 0, 0, 0.54);
 }
 
