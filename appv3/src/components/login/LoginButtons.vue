@@ -18,13 +18,17 @@ export default {
     return {
       backgroundUrl: backgroundUrl,
       center: "center",
-      signInUrl: '/auth-success',
-      serverIp: 'http://192.168.1.9:3000'
+      signInUrl: '/auth-success'
     };
   },
   methods: {
     signIn() {
       window.cordova.InAppBrowser.open(this.serverIp+this.signInUrl, '_system', 'location=yes');
+    }
+  },
+  computed: {
+    serverIp: function() {
+      return `${process.env.VUE_APP_PROTOCOL}://${process.env.VUE_APP_HOST}:${process.env.VUE_APP_PORT}`
     }
   }
 };

@@ -9,6 +9,7 @@ export default {
   name: "App",
   mounted() {
     document.addEventListener("deviceready", () => {
+      this.$router.replace("Activities");
       window.handleOpenURL = url => {
         url = url.replace("beesocial://", "").split("/");
         switch (url[0]) {

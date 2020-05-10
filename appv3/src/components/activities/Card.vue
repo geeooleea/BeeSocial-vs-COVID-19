@@ -10,10 +10,16 @@ export default {
     return {
     };
   },
-  props: [
-    "backgroundImage",
-    "title"
-  ]
+  props: {
+    title: String,
+    img: String,
+    id: Number
+  },
+  computed: {
+    backgroundUrl: function() {
+      return `${process.env.VUE_APP_PROTOCOL}://${process.env.VUE_APP_HOST}:${process.env.VUE_APP_PORT}/${this.img}`;
+    }
+  }
 };
 </script>
 

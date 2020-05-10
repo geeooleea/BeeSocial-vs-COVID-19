@@ -9,6 +9,7 @@
 import IntroActivities from '@/components/activities/IntroActivities.vue';
 import ActivitiesList from '@/components/activities/ActivitiesList.vue';
 
+
 export default {
     name: 'Activities',
     components: {
