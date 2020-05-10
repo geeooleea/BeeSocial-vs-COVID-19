@@ -5,7 +5,6 @@ var app = express();
 
 var http = require('http').createServer(app);
 var io = require('socket.io')(http);
-var ip = require('ip');
 
 var Dao = require('./dao.js');
 var dao = new Dao();
@@ -17,6 +16,7 @@ const bodyParser = require('body-parser');
 app.use(bodyParser.urlencoded({
     extended: true
 }));
+
 app.use(bodyParser.json());
 
 app.use(function (req, res, next) {
@@ -38,7 +38,7 @@ http.listen(process.env.PORT, function () {
 passport.use(new GoogleStrategy({
     clientID: process.env.GOOGLE_CLIENT_ID,
     clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-    callbackURL: 'http://beesocial.ddns.net/auth/google/callback'
+    callbackURL: 'http://localhost:3000/auth/google/callback'
 },
     function (accessToken, refreshToken, profile, done) {
         console.log(profile)
@@ -59,20 +59,14 @@ app.get('/auth/google/callback',
     });
 
 app.get('/auth-success', (req, res) => {
-    res.send('<head></head><body><a href=\"beesocial://auth/ok/34785g2ur289f98eb8\">fraaa</a></body>');
+    // res.send('<head></head><body><a href=\"beesocial://auth/ok/34785g2ur289f98eb8\">fraaa</a></body>');
+    res.send('Successful authentication :)');
 });
-// app.get('/', (req,res) => {send
-//    res.sendFile(__dirname + '/index.html');
-//});/*
+
 io.on('connection', function (socket) {
     socket.on('chat message', function (msg) {
         io.emit('chat message', msg);
     });
-});
-
-// GET images
-app.get('/img/:type/:name', (req, res) => {
-    res.sendFile(process.env.SERVER_PATH + '/img/' + req.params.type + '/' + req.params.name);
 });
 
 // GET the list of all activities
