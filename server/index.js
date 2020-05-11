@@ -6,8 +6,11 @@ var app = express();
 var http = require('http').createServer(app);
 var io = require('socket.io')(http);
 
-var Dao = require('./dao.js');
-var dao = new Dao();
+// var Dao = require('./dao.js');
+// var dao = new Dao();
+
+var PG = require('./pg.js');
+var dao = new PG();
 
 var passport = require('passport');
 var GoogleStrategy = require('passport-google-oauth').OAuth2Strategy;
@@ -32,7 +35,7 @@ app.use(express.static('assets/'));
 
 http.listen(process.env.PORT, function () {
     console.log('listening on *:' + process.env.PORT);
-    dao.connect();
+    //dao.connect();
 });
 
 passport.use(new GoogleStrategy({
@@ -72,7 +75,7 @@ io.on('connection', function (socket) {
 // GET the list of all activities
 app.get('/activities', (req, res) => {
     dao.getActivities((results) => {
-        res.json(results);
+        res.json(results.rows);
     });
 });
 

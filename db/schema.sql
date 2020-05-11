@@ -1,7 +1,7 @@
 USE beesocial;
 
 CREATE TABLE IF NOT EXISTS activities(
-    id INT NOT NULL AUTO_INCREMENT,
+    id SERIAL,
     title VARCHAR(40) NOT NULL,
     description VARCHAR(256) NOT NULL,
     img VARCHAR(256) NOT NULL,
@@ -9,7 +9,7 @@ CREATE TABLE IF NOT EXISTS activities(
 );
 
 CREATE TABLE IF NOT EXISTS users(
-    id INT NOT NULL AUTO_INCREMENT,
+    id SERIAL,
     name VARCHAR(40) NOT NULL,
     last_name VARCHAR(40) NOT NULL,
     email VARCHAR(128),
