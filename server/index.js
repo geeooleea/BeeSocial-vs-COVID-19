@@ -31,7 +31,7 @@ app.use(function (req, res, next) {
     next();
 });
 
-app.use(express.static(__dirname + 'assets/'));
+app.use(express.static(__dirname + '/assets'));
 
 http.listen(process.env.PORT, function () {
     console.log('listening on *:' + process.env.PORT);
