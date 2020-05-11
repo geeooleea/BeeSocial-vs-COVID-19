@@ -1,1 +1,1 @@
-web: ./server npm start
+web: node index
