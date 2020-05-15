@@ -15,6 +15,17 @@ var dao = new PG();
 var passport = require('passport');
 var GoogleStrategy = require('passport-google-oauth').OAuth2Strategy;
 
+app.use(passport.initialize());
+app.use(passport.session());
+
+passport.serializeUser(function(user, done) {
+    done(null, user);
+  });
+  
+  passport.deserializeUser(function(user, done) {
+    done(null, user);
+  });
+
 const bodyParser = require('body-parser');
 app.use(bodyParser.urlencoded({
     extended: true
@@ -42,10 +53,9 @@ passport.use(new GoogleStrategy({
     clientID: process.env.GOOGLE_CLIENT_ID,
     clientSecret: process.env.GOOGLE_CLIENT_SECRET,
     callbackURL: 'http://localhost:3000/auth/google/callback'
-},
+    },
     function (accessToken, refreshToken, profile, done) {
-        console.log(profile)
-        dao.findOrCreateUser(profile, function (err, user) {
+        dao.findOrCreateUser(profile._json, (err, user) => {
             return done(err, user);
         });
     }
@@ -55,14 +65,13 @@ app.get('/auth/google',
     passport.authenticate('google', { scope: ['https://www.googleapis.com/auth/plus.login', 'https://www.googleapis.com/auth/userinfo.email'] }));
 
 app.get('/auth/google/callback',
-    passport.authenticate('google', { failureRedirect: '/login' }),
-    function (req, res) {
-        console.log(req)
-        res.redirect(process.env.HOSTNAME + '/auth-success');
+    passport.authenticate('google', { failureRedirect: '/auth/google' }),
+    (req, res) => {
+        res.redirect('/auth-success');
     });
 
 app.get('/auth-success', (req, res) => {
-    // res.send('<head></head><body><a href=\"beesocial://auth/ok/34785g2ur289f98eb8\">fraaa</a></body>');
+    //res.send('<head></head><body><a href=\"beesocial://auth/ok/34785g2ur289f98eb8\">fraaa</a></body>');
     res.send('Successful authentication :)');
 });
 
