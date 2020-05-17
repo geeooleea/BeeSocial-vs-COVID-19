@@ -65,14 +65,13 @@ app.get('/auth/google',
     passport.authenticate('google', { scope: ['https://www.googleapis.com/auth/plus.login', 'https://www.googleapis.com/auth/userinfo.email'] }));
 
 app.get('/auth/google/callback',
-    passport.authenticate('google', { failureRedirect: '/auth/google' }),
+    passport.authenticate('google', { failureRedirect: 'beesocial://' }),
     (req, res) => {
-        res.redirect('/auth-success');
+        res.redirect('beesocial://activities');
     });
 
 app.get('/auth-success', (req, res) => {
-    //res.send('<head></head><body><a href=\"beesocial://auth/ok/34785g2ur289f98eb8\">fraaa</a></body>');
-    res.send('Successful authentication :)');
+    res.redirect();
 });
 
 io.on('connection', function (socket) {
